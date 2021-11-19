@@ -10,14 +10,14 @@ from time import sleep
 """
 def runCommand(command:str, workingDir: str, showErrors: bool, timeoutSeconds: int):
     # Get the platform of the system - this is because windows systems need the command to be run in the background a different way to Unix systems
-    isWindowsSystem = platform.system() == "Windows"
+    isWindowsSystem = platform.system() == "Windows"    
     
     # Run the command
     process = subprocess.Popen(command,
                             cwd=workingDir,
                             shell=True,
-                            stdout=subprocess.PIPE if not isWindowsSystem and not showErrors else 0,
-                            stderr=subprocess.PIPE if not isWindowsSystem and not showErrors else 0,
+                            stdout=subprocess.PIPE if not isWindowsSystem and not showErrors else None,
+                            stderr=subprocess.PIPE if not isWindowsSystem and not showErrors else None,
                             creationflags=subprocess.CREATE_NEW_CONSOLE if isWindowsSystem and not showErrors else 0)
     
     # Timeout the command if it has taken too long

@@ -18,6 +18,20 @@ class Logger:
     longestPossibleMessage = 13
     
     """
+        The constructor for the logger
+        noColour: A bool to determine whether no colour should be used in the logging messages
+    """
+    def __init__(self, noColour = True):
+        if (noColour):
+            self.successColour = ""
+            self.notificationColour = ""
+            self.interruptedColour = ""
+            self.warningColour = ""
+            self.variable = ""
+            self.errorColour = ""
+            self.endColour = ""
+    
+    """
         Initialises the printer to allow for formatting to be done properly
         jobs: The list of jobs to be done
     """

@@ -12,13 +12,14 @@ class TestRunner:
         The constructor for the test runner
         showErrors: Whether the errors should be shown
         timeoutSeconds: How long before the test should timeout
+        noColour: Whether no colour should be used in logging
     """
-    def __init__(self, showErrors = False, timeoutSeconds = 30):
+    def __init__(self, showErrors = False, timeoutSeconds = 30, noColour = False):
         self.showErrors = showErrors
         self.timeoutSeconds = timeoutSeconds
         
         # Init the logprinter
-        self.logPrinter = Logger()
+        self.logPrinter = Logger(noColour)
         
     """
         Test all of the jobs in the jobs list

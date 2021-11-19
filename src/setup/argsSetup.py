@@ -11,6 +11,7 @@ def setupArgs():
     parser.add_argument("-c", "--config", help="The configuration file to run the jobs from.", type=str, required=True)
     parser.add_argument("-s", "--onSuccess", help="The command to run on the success of all jobs.", type=str)
     parser.add_argument("-f", "--onFailure", help="The command to run if at least one job fails.", type=str)
+    parser.add_argument("-n", "--noColour", help="Whether no colour should be shown in the logging messages.", type=bool, default=False)
 
     # Return the arguments passed to the system
     return parser.parse_args()
