@@ -12,10 +12,12 @@ class TestRunner:
         showErrors: Whether the errors should be shown
         timeoutSeconds: How long before the test should timeout
         noColour: Whether no colour should be used in logging
+        requireSuccessToProgress: Whether the previous job must be a success to trigger the next job
     """
-    def __init__(self, showErrors = False, timeoutSeconds = 30, noColour = False):
+    def __init__(self, showErrors = False, timeoutSeconds = 30, noColour = False, requireSuccessToProgress = False):
         self.showErrors = showErrors
         self.timeoutSeconds = timeoutSeconds
+        self.requireSuccessToProgress = requireSuccessToProgress
         
         # Init the logprinter
         self.logPrinter = Logger(noColour)
@@ -43,6 +45,15 @@ class TestRunner:
                 
                 if (allJobsSuccessful):
                     allJobsSuccessful = jobStatus == JobStatus.SUCCESS
+                    
+                # Stop here if a job has failed, but we require that all jobs are successful
+                if (self.requireSuccessToProgress and not allJobsSuccessful):
+                    # Set the rest of the jobs as cancelled
+                    for toInterruptJobIndex in range(jobIndex+1, len(jobs)):
+                        jobs[toInterruptJobIndex].status = JobStatus.CANCELLED
+                    self.logPrinter.printAllJobs(jobs)
+                    
+                    return allJobsSuccessful
         
         except KeyboardInterrupt:
             # Friendly exit if the tests are interrupted

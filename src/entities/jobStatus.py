@@ -7,3 +7,4 @@ class JobStatus(Enum):
     FAILURE = 3
     TIMEOUT = 4
     SUCCESS = 5
+    CANCELLED = 6

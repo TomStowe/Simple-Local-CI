@@ -9,7 +9,7 @@ args = setupArgs()
 jobs = ConfigLoader(args.config).loadConfig(args.baseDirectory)
 
 # Run the jobs
-testRunner = TestRunner(args.showErrors, args.timeout, args.noColour)
+testRunner = TestRunner(args.showErrors, args.timeout, args.noColour, args.requireSuccess)
 allJobsSuccessful = testRunner.startTest(jobs)
 
 # Run commands on failure or success as defined in the arguments

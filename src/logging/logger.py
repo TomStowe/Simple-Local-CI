@@ -33,6 +33,7 @@ class Logger:
             self.variable = ""
             self.errorColour = ""
             self.endColour = ""
+            self.grayColour = ""
     
     """
         Initialises the printer to allow for formatting to be done properly
@@ -69,6 +70,8 @@ class Logger:
                 self.printTimeoutMessage(job.name)
             elif(job.status == JobStatus.SUCCESS):
                 self.printSuccessMessage(job.name)
+            elif(job.status == JobStatus.CANCELLED):
+                self.printCancelledJob(job.name)
                 
         self.printStartEndMessage()
 
@@ -81,12 +84,20 @@ class Logger:
         print(f"{self.notificationColour}{dashes}{self.endColour}")
         
     """
-        Print a message that the test is running
+        Print a message that the test is pending
         name: The name of the test that is being run
     """
     def printPendingMessage(self, name: str):
         self.__printMessage(self.grayColour, name, "PENDING")
         
+    """
+        Print a message that the test is cancelled
+        name: The name of the test that is being run
+    """
+    def printCancelledJob(self, name: str):
+        self.__printMessage(self.interruptedColour, name, "CANCELLED")
+            
+    
     """
         Print a message that the test is running
         name: The name of the test that is being run
