@@ -3,8 +3,10 @@ A simple python application for running a CI pipeline locally
 This app currently supports GitLab CI scripts
 
 ## ⚙️ Setup
-1. Install the python dependencies in `requirements.txt`
-2. Run the CI runner using `python3 main.py -d <directoryToTestIn> -c <configFile>` replacing the fields between `<>`
+1. Download the latest build from the releases section on the GitHub page
+2. Unzip the files
+3. Using the cmd or terminal of your machine, navigate to the folder and run `simpleLocalCI.exe` with the arguments as described below
+    * E.g. `simpleLocalCI.exe -c testCIConfigFile.yaml -d textProject/src -rs True`
 
 ## ✅ Arguments
 When calling the local ci runner, the following arguments can be included
@@ -19,6 +21,13 @@ When calling the local ci runner, the following arguments can be included
 |   `--noColour` (`-n`)     	|  Whether no colour should be shown in the logging messages.       	|  Boolean 	|     N    	|  False   	|
 |   `--requireSuccess` (`-rs`)  |  Whether the previous job must be a success to trigger the next job.  |  Boolean 	|     N    	|  False   	|
 
+## Local Dev
+1. Install the python dependencies in `requirements.txt`
+2. Run the CI runner using `python3 main.py -d <directoryToTestIn> -c <configFile>` replacing the fields between `<>`
+
+## Building
+1. Setup you [local dev environment](#local-dev)
+2. Run the `build.cmd`
 ## 🎓 Licence
 This software is released under the [GNU AGPLv3](LICENSE) licence
 
