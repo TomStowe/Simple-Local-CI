@@ -1,3 +1,5 @@
+import os
+from src.entities.jobStatus import JobStatus
 
 """
     Defines the logger used for displaying the CI status
@@ -10,6 +12,7 @@ class Logger:
     warningColour = "\033[93m"
     errorColour = "\033[91m"
     endColour = "\033[0m"
+    grayColour = "\u001b[38;5;$249m"
     
     # How many spaces to pad before each message
     padding = 3
@@ -44,22 +47,52 @@ class Logger:
                 
         # Update the longest possible message for main message printing
         self.longestPossibleMessage += self.longestNameLength
+        
+    def printAllJobs(self, jobs):
+        # Clear the console depending on the os
+        if os.name == 'nt':
+            os.system("cls")
+        else:
+            os.system("clear")
+            
+        self.printStartEndMessage()
+        for job in jobs:
+            if (job.status == JobStatus.PENDING):
+                self.printPendingMessage(job.name)
+            elif(job.status == JobStatus.RUNNING):
+                self.printRunningMessage(job.name)
+            elif(job.status == JobStatus.INTERRUPTED):
+                self.printInterruptedMessage(job.name)
+            elif(job.status == JobStatus.FAILURE):
+                self.printErrorMessage(job.name)
+            elif(job.status == JobStatus.TIMEOUT):
+                self.printTimeoutMessage(job.name)
+            elif(job.status == JobStatus.SUCCESS):
+                self.printSuccessMessage(job.name)
+                
+        self.printStartEndMessage()
 
     """
         Print a main testing message
-        message: The message to print
     """
-    def printMainTestingMessage(self, message: str):
-        dashes = "-" * (((self.longestPossibleMessage - len(message) - 2) // 2) + self.padding)
+    def printStartEndMessage(self):
+        dashes = "-" * (self.longestPossibleMessage + self.padding)
         
-        print(f"{self.notificationColour}{dashes} {message} {dashes}{self.endColour}")
+        print(f"{self.notificationColour}{dashes}{self.endColour}")
+        
+    """
+        Print a message that the test is running
+        name: The name of the test that is being run
+    """
+    def printPendingMessage(self, name: str):
+        self.__printMessage(self.grayColour, name, "PENDING")
         
     """
         Print a message that the test is running
         name: The name of the test that is being run
     """
     def printRunningMessage(self, name: str):
-        self.__printMessage(self.warningColour, name, "RUNNING", "\r")
+        self.__printMessage(self.warningColour, name, "RUNNING")
         
     """
         Print a message that the test has been interrupted

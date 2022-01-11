@@ -1,6 +1,5 @@
-import subprocess, platform
-from time import sleep
 from src.entities.job import Job
+from src.entities.jobStatus import JobStatus
 from src.logging.logger import Logger
 from src.setup.runCommand import runCommand
 
@@ -30,22 +29,28 @@ class TestRunner:
         allJobsSuccessful = True
         
         self.logPrinter.setupLogPrinter(jobs)
-        self.logPrinter.printMainTestingMessage("Tests Started")
+        self.logPrinter.printAllJobs(jobs)
         
         try:
-            for job in jobs:
-                sucessfulJob = self.__runJob(job)
+            for jobIndex in range(len(jobs)):
+                jobs[jobIndex].status = JobStatus.RUNNING
+                self.logPrinter.printAllJobs(jobs)
+                
+                jobStatus = self.__runJob(jobs[jobIndex])
+                jobs[jobIndex].status = jobStatus
+                
+                self.logPrinter.printAllJobs(jobs)
                 
                 if (allJobsSuccessful):
-                    allJobsSuccessful = sucessfulJob
+                    allJobsSuccessful = jobStatus == JobStatus.SUCCESS
         
         except KeyboardInterrupt:
             # Friendly exit if the tests are interrupted
-            self.logPrinter.printInterruptedMessage(job.name)
-            self.logPrinter.printMainTestingMessage("Tests Interrupted")
+            for toInterruptJobIndex in range(jobIndex, len(jobs)):
+                jobs[toInterruptJobIndex].status = JobStatus.INTERRUPTED
+            self.logPrinter.printAllJobs(jobs)
             quit()
             
-        self.logPrinter.printMainTestingMessage("Tests Completed")
         return allJobsSuccessful
        
     """
@@ -53,26 +58,21 @@ class TestRunner:
         job: The job to run
         returns: True if the job was successful, false otherwise
     """ 
-    def __runJob(self, job: Job):
-        self.logPrinter.printRunningMessage(job.name)
-        
+    def __runJob(self, job: Job):        
         # Run all of the commands from the job
         result = self.__runCommand(job.getStringJobSteps(), job.path)
         
         # Timeout check
         if (result.returncode == None):
-            self.logPrinter.printTimeoutMessage(job.name)
+            return JobStatus.TIMEOUT
                 
         # Success Check
         elif (result.returncode == 0):
-            self.logPrinter.printSuccessMessage(job.name)
-            return True
+            return JobStatus.SUCCESS
         
         # If the test errored
         else:
-            self.logPrinter.printErrorMessage(job.name)
-            
-        return False
+            return JobStatus.FAILURE
         
     """
         Run a command
@@ -85,12 +85,12 @@ class TestRunner:
 
 if __name__ == "__main__":
     jobs = [
-        Job("Backend Build", ["dotnet clean", "dotnet build -warnAsError"], "C:/Users/tstowe/Git/net-zero-platform"),
-        Job("Backend Test", ["dotnet test"], "C:/Users/tstowe/Git/net-zero-platform"),
-        Job("Frontend Install", ["npm install"], "C:/Users/tstowe/Git/net-zero-platform/web-app"),
-        Job("Frontend Build", ["npm run build"], "C:/Users/tstowe/Git/net-zero-platform/web-app"),
-        Job("Frontend Lint", ["npm run build"], "C:/Users/tstowe/Git/net-zero-platform/web-app"),
-        Job("Frontend Test", ["set CI=true", "npm run test"], "C:/Users/tstowe/Git/net-zero-platform/web-app")
+        Job("Backend Build", ["dotnet clean", "dotnet build -warnAsError"], "C:/Users/tstowe/Git/net-zero-platform", "PENDING"),
+        Job("Backend Test", ["dotnet test"], "C:/Users/tstowe/Git/net-zero-platform", "PENDING"),
+        Job("Frontend Install", ["npm install"], "C:/Users/tstowe/Git/net-zero-platform/web-app", "PENDING"),
+        Job("Frontend Build", ["npm run build"], "C:/Users/tstowe/Git/net-zero-platform/web-app", "PENDING"),
+        Job("Frontend Lint", ["npm run build"], "C:/Users/tstowe/Git/net-zero-platform/web-app", "PENDING"),
+        Job("Frontend Test", ["set CI=true", "npm run test"], "C:/Users/tstowe/Git/net-zero-platform/web-app", "PENDING")
     ]
     try:
         TestRunner().startTest(jobs)

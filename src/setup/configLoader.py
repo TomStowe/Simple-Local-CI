@@ -1,5 +1,6 @@
 import yaml
 from src.entities.job import Job
+from src.entities.jobStatus import JobStatus
 
 """
     Defines the logic for loading the data out of a config file
@@ -29,6 +30,6 @@ class ConfigLoader:
                 continue
             
             # Create the job
-            jobs.append(Job(name= key, steps= values["script"], path= baseDirectory))
+            jobs.append(Job(name= key, steps= values["script"], path= baseDirectory, status=JobStatus.PENDING))
             
         return jobs

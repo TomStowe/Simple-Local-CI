@@ -1,4 +1,3 @@
-import platform
 from src.setup.configLoader import ConfigLoader
 from src.setup.runCommand import runCommand
 from src.testRunner import TestRunner
