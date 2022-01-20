@@ -11,8 +11,8 @@ class Logger:
     interruptedColour = "\033[94m"
     warningColour = "\033[93m"
     errorColour = "\033[91m"
-    endColour = "\033[0m"
     grayColour = "\u001b[38;5;$249m"
+    endColour = "\033[0m"
     
     # How many spaces to pad before each message
     padding = 3
@@ -32,8 +32,8 @@ class Logger:
             self.warningColour = ""
             self.variable = ""
             self.errorColour = ""
-            self.endColour = ""
             self.grayColour = ""
+            self.endColour = ""
     
     """
         Initialises the printer to allow for formatting to be done properly
@@ -49,7 +49,7 @@ class Logger:
         # Update the longest possible message for main message printing
         self.longestPossibleMessage += self.longestNameLength
         
-    def printAllJobs(self, jobs):
+    def printAllJobs(self, jobs, errorMessages = None):
         # Clear the console depending on the os
         if os.name == 'nt':
             os.system("cls")
@@ -74,6 +74,11 @@ class Logger:
                 self.printCancelledJob(job.name)
                 
         self.printStartEndMessage()
+        
+        if (errorMessages != None):
+            print("")
+            print(self.errorColour + "Output For Errored Command:" + self.endColour)
+            print(errorMessages)
 
     """
         Print a main testing message

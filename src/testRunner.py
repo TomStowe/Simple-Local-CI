@@ -38,10 +38,9 @@ class TestRunner:
                 jobs[jobIndex].status = JobStatus.RUNNING
                 self.logPrinter.printAllJobs(jobs)
                 
-                jobStatus = self.__runJob(jobs[jobIndex])
+                jobStatus, errors = self.__runJob(jobs[jobIndex])
                 jobs[jobIndex].status = jobStatus
                 
-                self.logPrinter.printAllJobs(jobs)
                 
                 if (allJobsSuccessful):
                     allJobsSuccessful = jobStatus == JobStatus.SUCCESS
@@ -51,9 +50,13 @@ class TestRunner:
                     # Set the rest of the jobs as cancelled
                     for toInterruptJobIndex in range(jobIndex+1, len(jobs)):
                         jobs[toInterruptJobIndex].status = JobStatus.CANCELLED
-                    self.logPrinter.printAllJobs(jobs)
+                    
+                    self.logPrinter.printAllJobs(jobs, errors if self.showErrors else None)
                     
                     return allJobsSuccessful
+                else:
+                    # If all is going well, print the jobs
+                    self.logPrinter.printAllJobs(jobs)
         
         except KeyboardInterrupt:
             # Friendly exit if the tests are interrupted
@@ -67,23 +70,11 @@ class TestRunner:
     """
         Run a specific job
         job: The job to run
-        returns: True if the job was successful, false otherwise
+        returns: A tuple of the job status and any errors that occurred
     """ 
     def __runJob(self, job: Job):        
         # Run all of the commands from the job
-        result = self.__runCommand(job.getStringJobSteps(), job.path)
-        
-        # Timeout check
-        if (result.returncode == None):
-            return JobStatus.TIMEOUT
-                
-        # Success Check
-        elif (result.returncode == 0):
-            return JobStatus.SUCCESS
-        
-        # If the test errored
-        else:
-            return JobStatus.FAILURE
+        return self.__runCommand(job.getStringJobSteps(), job.path)
         
     """
         Run a command

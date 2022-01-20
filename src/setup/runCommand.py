@@ -1,5 +1,5 @@
-import platform, subprocess
-from time import sleep
+import subprocess
+from src.entities.jobStatus import JobStatus
 
 """
     Runs a specific command from this app
@@ -7,24 +7,24 @@ from time import sleep
     workingDir: The working directory to run the command from
     showErrors: A boolean as to whether error messages should be shown
     timeoutSeconds: The time in seconds before a command should be timed out
+    returns: A tuple of the job status and any errors that occurred
 """
 def runCommand(command:str, workingDir: str, showErrors: bool, timeoutSeconds: int):
-    # Get the platform of the system - this is because windows systems need the command to be run in the background a different way to Unix systems
-    isWindowsSystem = platform.system() == "Windows"    
-    
-    # Run the command
-    process = subprocess.Popen(command,
+    try:
+        # Run the command
+        process = subprocess.run(command,
                             cwd=workingDir,
                             shell=True,
-                            stdout=subprocess.PIPE if not isWindowsSystem and not showErrors else None,
-                            stderr=subprocess.PIPE if not isWindowsSystem and not showErrors else None,
-                            creationflags=subprocess.CREATE_NEW_CONSOLE if isWindowsSystem and not showErrors else 0)
-    
-    # Timeout the command if it has taken too long
-    for t in range(timeoutSeconds):
-        sleep(1)
-        if (process.poll() is not None):
-            return process
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            timeout=timeoutSeconds)
         
-    process.kill()
-    return process
+    except subprocess.TimeoutExpired:
+        return (JobStatus.TIMEOUT, "")
+    
+    if (process.returncode == 0):
+        return (JobStatus.SUCCESS, process.stdout.decode("UTF-8"))
+    else:
+        return (JobStatus.FAILURE, process.stdout.decode("UTF-8") + "\n" + process.stderr.decode("UTF-8"))
+
+# python3 main.py -d "C:\Users\tomst\Git\Simple-Local-CI" -c testci.yaml -e t
